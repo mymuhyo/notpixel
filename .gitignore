@@ -1,10 +1,13 @@
 .env
 
 sessions/
+venv/
 
 .idea/
 
 __pycache__
+
+used_sessions.txt
 
 *.session
 
