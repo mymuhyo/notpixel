@@ -8,6 +8,7 @@ venv/
 __pycache__
 
 used_sessions.txt
+.python-version
 
 *.session
 
