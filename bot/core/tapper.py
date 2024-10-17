@@ -131,7 +131,6 @@ class Tapper:
 
             if self.tg_client.is_connected:
                 await self.tg_client.disconnect()
-
             return auth_token
 
         except InvalidSession as error:
@@ -146,11 +145,6 @@ class Tapper:
         custom_headers['User-Agent'] = user_agent
         bearer_token = None
         try:
-            response = await http_client.get(url='https://ipinfo.io/ip', timeout=aiohttp.ClientTimeout(20))
-            ip = (await response.text())
-
-            logger.info(f"{self.session_name} | NotGames logging in with proxy IP: {ip}")
-
             custom_headers["Host"] = "api.notcoin.tg"
             custom_headers["bypass-tunnel-reminder"] = "x"
             custom_headers["TE"] = "trailers"
@@ -203,11 +197,16 @@ class Tapper:
             await asyncio.sleep(delay=randint(3, 7))
             await self.login(http_client)
 
-    async def check_proxy(self, http_client: aiohttp.ClientSession, proxy: Proxy) -> None:
+    async def check_proxy(self, http_client: aiohttp.ClientSession, service_name, proxy: Proxy) -> None:
         try:
-            response = await http_client.get(url='https://ipinfo.io/ip', timeout=aiohttp.ClientTimeout(20))
-            ip = (await response.text())
-            logger.info(f"{self.session_name} | Proxy IP: {ip}")
+            response = await http_client.get(url='https://ipinfo.io/json', timeout=aiohttp.ClientTimeout(20))
+            response.raise_for_status()
+
+            response_json = await response.json()
+            ip = response_json.get('ip', 'NO')
+            country = response_json.get('country', 'NO')
+
+            logger.info(f"{self.session_name} | Logging in with proxy IP {ip} and country {country}")
         except Exception as error:
             logger.error(f"{self.session_name} | Proxy: {proxy} | Error: {error}")
 
@@ -416,6 +415,16 @@ class Tapper:
         except Exception as error:
             return 0
 
+    async def j_template(self, http_client: aiohttp.ClientSession, template_id):
+        try:
+            resp = await http_client.put(f"https://notpx.app/api/v1/image/template/subscribe/{template_id}")
+            resp.raise_for_status()
+            await asyncio.sleep(randint(1, 3))
+            return resp.status == 204
+        except Exception as error:
+            logger.error(f"Unknown error upon joining a template: {error}")
+            return False
+
     async def join_template(self, http_client: aiohttp.ClientSession):
         try:
             tmpl = await self.notpx_template(http_client)
@@ -441,7 +450,7 @@ class Tapper:
 
         async with aiohttp.ClientSession(headers=headers, connector=proxy_conn, trust_env=True) as http_client:
             if proxy:
-                await self.check_proxy(http_client=http_client, proxy=proxy)
+                await self.check_proxy(http_client=http_client, service_name="NotPixel", proxy=proxy)
 
             ref = settings.REF_ID
             link = get_link(ref)
@@ -487,12 +496,14 @@ class Tapper:
                     await inform(self.user_id, balance)
 
                     if await self.join_template(http_client=http_client):
-                        self.joined = False
-                        delay = randint(60, 120)
-                        logger.info(f"{self.session_name} | Joining to template restart in {delay} seconds.")
-                        await asyncio.sleep(delay=delay)
-                        token_live_time = 0
-                        continue
+                        tmpl_req = await self.j_template(http_client=http_client, template_id=self.template_to_join)
+                        if not tmpl_req:
+                            self.joined = False
+                            delay = randint(60, 120)
+                            logger.info(f"{self.session_name} | Joining to template restart in {delay} seconds.")
+                            await asyncio.sleep(delay=delay)
+                            token_live_time = 0
+                            continue
 
                     if settings.AUTO_DRAW:
                         await self.paint(http_client=http_client)

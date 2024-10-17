@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> 35bfa534ec0a756cfbf2dceb9e8f3a315bf6ac98
 import aiohttp
 import asyncio
 
@@ -63,7 +66,7 @@ async def get_cords_and_color(user_id, template, times_to_fall=10):
         logger.error(f"Server unreachable, retrying in 30 seconds, attempt {10 - times_to_fall + 1}/10")
         await asyncio.sleep(30)
         if times_to_fall > 0:
-            return await get_cords_and_color(user_id, times_to_fall-1)
+            return await get_cords_and_color(user_id, template, times_to_fall-1)
         exit()
 
 
