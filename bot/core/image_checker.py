@@ -1,10 +1,6 @@
-import json
 
-import random
 import aiohttp
 import asyncio
-from PIL import Image
-from io import BytesIO
 
 from bot.utils import logger
 
