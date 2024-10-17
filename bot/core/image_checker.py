@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-
-=======
->>>>>>> 35bfa534ec0a756cfbf2dceb9e8f3a315bf6ac98
 import aiohttp
 import asyncio
 
