@@ -23,7 +23,6 @@ class Settings(BaseSettings):
     NIGHT_CHECKING: list[int] = [3000, 5000]
     ENERGY_LIMIT_MAX_LEVEL: int = 7
     PAINT_REWARD_MAX_LEVEL: int = 7
-    PAINT_REWARD_MAX_LEVEL: int = 7
     RECHARGE_SPEED_MAX_LEVEL: int = 11
     POINTS_3X: bool = False
 
