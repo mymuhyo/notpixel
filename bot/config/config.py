@@ -16,13 +16,13 @@ class Settings(BaseSettings):
     CLAIM_REWARD: bool = True
     AUTO_UPGRADE: bool = True
     REF_ID: str = 'f1896596326_t_s583807'
-    IGNORED_BOOSTS: list[str] = ['paintReward', 'jettonTask']
+    IGNORED_BOOSTS: list[str] = ['jettonTask']
     IN_USE_SESSIONS_PATH: str = 'used_sessions.txt'
     NIGHT_MODE: bool = True
     NIGHT_TIME: list[int] = [17, 23] #UTC HOURS
     NIGHT_CHECKING: list[int] = [3000, 5000]
     ENERGY_LIMIT_MAX_LEVEL: int = 7
-    PAINT_REWARD_MAX_LEVEL: int = 2
+    PAINT_REWARD_MAX_LEVEL: int = 7
     RECHARGE_SPEED_MAX_LEVEL: int = 11
     POINTS_3X: bool = False
 
